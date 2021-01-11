@@ -1,0 +1,35 @@
+/* Css effects for the analytics logo */
+#path0 {
+  fill: grey;
+}
+
+#path1 {
+  fill: #EEFBFB;
+}
+
+#path0:hover {
+  fill: #008080;
+}
+
+#path1:hover + #path0 {
+  fill: #008080;
+}
+
+#svg {
+    margin-top: -0.3em;
+    float: right;
+}
+
+body{
+  background-color: #EEFBFB;
+}
+
+.two.wide.right.aligned.column {
+    padding-top: 1.5em;
+    margin-right: -1.5em;
+}
+
+#report_status_date {
+    margin-top: 0.4em;
+    color: green;
+}
