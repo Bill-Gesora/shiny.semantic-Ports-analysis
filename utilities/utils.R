@@ -1,12 +1,13 @@
 # Setting the general options for R ----
-# Remove scientific notations
 options(scipen = 999)
+
+# Loading the data
+load("files.RData")
 
 # When data is null skip filter
 conditional_filter <- function(condition, success) {
   if (condition) success else TRUE
 }
-
 
 # Functions used in leafltet ----
 # Color palltet for different ships
@@ -28,7 +29,7 @@ leaflet_icons <- function(data) {
       data$ship_type == "Unspecified" ~ "images/Unspecified.svg",
       data$ship_type == "Tug" ~ "images/Tug.svg",
       data$ship_type == "Fishing" ~ "images/Fishing.svg",
-      data$ship_type == "Passenger" ~ "/images/Passenger.svg",
+      data$ship_type == "Passenger" ~ "images/Passenger.svg",
       data$ship_type == "Pleasure" ~ "images/Pleasure.svg",
       data$ship_type == "Navigation" ~ "images/Navigation.svg",
       data$ship_type == "High Special" ~ "images/High Special.svg"
@@ -51,7 +52,7 @@ ship_details <- function(data) {
               unique(data$ship_name)),
           div(class = "meta",
               tags$span(
-                tags$i(class = paste0(unique(data$flag)," flag")),
+                tags$i(class = paste0(unique(data$flag), " flag")),
                 unique(data$country)
               )
           ),
@@ -97,5 +98,3 @@ custom_kpi_box <- function(value, label, header, description, icon) {
        )
  )
   }
-
-

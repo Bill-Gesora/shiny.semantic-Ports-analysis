@@ -1,4 +1,4 @@
-source("utils.R")
+source("utilities/utils.R")
 
 # Reading the input files
 ships_data <- fread("data/ships.csv")
@@ -16,7 +16,7 @@ ships_data <- left_join(
 # 2. Giving meaningful title names to variables
 ships_data <- ships_data %>% 
   transmute(
-    ship_id = SHIP_ID,
+    ship_id = as.character(SHIP_ID),
     lat = LAT,
     lon = LON,
     speed = SPEED,
@@ -49,7 +49,7 @@ ships_data <- ships_data %>%
       ship_type == "Unspecified" ~ "images/Unspecified.svg",
       ship_type == "Tug" ~ "images/Tug.svg",
       ship_type == "Fishing" ~ "images/Fishing.svg",
-      ship_type == "Passenger" ~ "/images/Passenger.svg",
+      ship_type == "Passenger" ~ "images/Passenger.svg",
       ship_type == "Pleasure" ~ "images/Pleasure.svg",
       ship_type == "Navigation" ~ "images/Navigation.svg",
       ship_type == "High Special" ~ "images/High Special.svg"
@@ -92,6 +92,12 @@ max_dist_observation <- ships_data %>%
   arrange(desc(distance), desc(observation_time)) %>% 
   slice(1) %>% 
   ungroup()
+
+# Total distance travelled
+distance_travelled <- ships_data %>% 
+  group_by(ship_id) %>% 
+  summarize(distance = sum(distance, na.rm = TRUE))
+
 
 # Merging the data points ----
 # First data point (begin observation)
@@ -137,31 +143,38 @@ ship_data_statistics <- ships_data %>%
             dead_weight = mean(dead_weight)  
   ) 
 
-# 2. Average vessel speed
-average_speed <- ships_data %>% 
-  filter(is_parked %in% 0) %>% 
-  group_by(ship_id) %>% 
-  summarize(max_speed = max(speed, na.rm = TRUE),
-            min_speed = min(speed, na.rm = TRUE),
-            mean_speed = mean(speed, na.rm = TRUE)
-  )
+# # 2. Is the ship parked
+# park_status <- ships_data %>% 
+#   arrange(ship_id, desc(join_helper_column)) %>% 
+#   group_by(ship_id) %>% 
+#   slice_max(1) %>%
+#   select(ship_id, is_parked)
 
-# 3. Is the ship parked
-park_status <- ships_data %>% 
-  arrange(ship_id, desc(join_helper_column)) %>% 
-  group_by(ship_id) %>% 
-  slice_max(1) %>%
-  select(ship_id, is_parked)
-
-# 4. Daily observations
+# 3. Daily observations
 daily_observations <- ships_data %>% 
   filter(is_parked == 0) %>% 
   group_by(ship_id, 
            observation_time) %>% 
   summarise(speed = mean(speed))
 
-# 5.Last observation
+# 4.Last observation
 final_observations <- ships_data %>% 
   group_by(ship_id) %>% 
   arrange(desc(observation_time)) %>% 
   slice_max(1) %>% ungroup()
+
+# 5. Number of observations
+observations <- ships_data %>% 
+  group_by(ship_id) %>% 
+  summarize(count = n())
+
+# Saving R data for purposes of deployment
+save(distance_travelled,
+     observations,
+        begin_observation,
+        end_observation,
+        analyzed_data,
+        ship_data_statistics,
+        final_observations,
+        file = "files.RData"
+        )

@@ -1,5 +1,5 @@
 
-source("utils.R")
+source("utilities/utils.R")
 
 filtersUi <- function(id, label = "ports_location"){
   ns <- NS(id)
@@ -40,7 +40,7 @@ filtersUi <- function(id, label = "ports_location"){
                               tags$h3(
                                 id = "report_status_date",
                                 tags$em(
-                                paste0("...status as at ",max(ships_data$observation_date))
+                                paste0("...status as at ", max(final_observations$observation_date))
                                 )
                               )
                           )
@@ -74,17 +74,7 @@ filtersServer <- function(id, data) {
           ) 
         } 
       })
-      
-      observe({
-        req(input$ship_type_filter)
-        
-      if (!is.null(input$ship_name_filter)) {
-          isolate(input$ship_type_filter)
-      } 
-        
-      })
-          
-        
+
       filtered_data <- reactive({
 
         data() %>%
